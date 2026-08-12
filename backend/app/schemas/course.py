@@ -29,6 +29,7 @@ class ExercisePublic(BaseModel):
 
 class AnswerCheckRequest(BaseModel):
     answer: str | list  # string for most types, list for match_pairs
+    lesson_session_id: int
 
 
 class AnswerCheckResponse(BaseModel):
@@ -86,9 +87,11 @@ class SkillTreeResponse(BaseModel):
     units: list[UnitPublic]
 
 
+class StartLessonResponse(BaseModel):
+    session_id: int
+
 class LessonCompleteRequest(BaseModel):
-    hearts_lost: int
-    time_taken_seconds: int
+    session_id: int
 
 
 class LessonCompleteResponse(BaseModel):

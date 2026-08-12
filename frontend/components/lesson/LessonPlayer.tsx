@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { X } from "lucide-react";
-import { getLessonExercises, checkAnswer, completeLesson } from "@/lib/api";
+import { getLessonExercises, checkAnswer, completeLesson, startLesson } from "@/lib/api";
 import { useLessonStore } from "@/stores/lessonStore";
 import { MultipleChoice } from "./exercises/MultipleChoice";
 import { TranslateWordBank } from "./exercises/TranslateWordBank";
@@ -38,25 +38,34 @@ export function LessonPlayer({ lessonId }: LessonPlayerProps) {
     queryFn: () => getLessonExercises(lessonId),
   });
 
-  // Initialize store when exercises load
+  // Initialize store and session when exercises load
+  const { mutate: startSession } = useMutation({
+    mutationFn: (id: number) => startLesson(id),
+    onSuccess: (result) => {
+      store.setLessonSessionId(result.session_id);
+    }
+  });
+
   useEffect(() => {
-    if (exercises) {
-      store.setExercises(exercises);
+    if (exercises && !store.lessonSessionId) {
+      store.initLesson(exercises);
+      startSession(lessonId);
       // Get current hearts from user query
       const userData = queryClient.getQueryData<{ hearts: number }>(["user", "me"]);
       setLocalHearts(userData?.hearts ?? 5);
     }
-  }, [exercises]);
+  }, [exercises, lessonId]);
 
   // Answer checking mutation
   const { mutate: submitAnswer, isPending: isChecking } = useMutation({
-    mutationFn: ({ exerciseId, answer }: { exerciseId: number; answer: string | Array<{ l: string; r: string }> }) =>
-      checkAnswer(exerciseId, answer),
+    mutationFn: ({ exerciseId, answer }: { exerciseId: number; answer: string | Array<{ l: string; r: string }> }) => {
+      if (!store.lessonSessionId) throw new Error("No active lesson session");
+      return checkAnswer(exerciseId, answer, store.lessonSessionId);
+    },
     onSuccess: (result: AnswerCheckResponse) => {
       if (result.correct) {
         store.setFeedback("correct", result);
       } else {
-        store.loseHeart();
         store.setFeedback("incorrect", result);
         const newHearts = localHearts - 1;
         setLocalHearts(newHearts);
@@ -69,12 +78,10 @@ export function LessonPlayer({ lessonId }: LessonPlayerProps) {
 
   // Lesson completion mutation
   const { mutate: doComplete } = useMutation({
-    mutationFn: () =>
-      completeLesson(
-        lessonId,
-        store.heartsLost,
-        Math.floor((Date.now() - store.startTime) / 1000)
-      ),
+    mutationFn: () => {
+      if (!store.lessonSessionId) throw new Error("No active lesson session");
+      return completeLesson(lessonId, store.lessonSessionId);
+    },
     onSuccess: (result) => {
       setCompleteResult(result);
       setShowComplete(true);

@@ -39,6 +39,20 @@ class LessonAttempt(Base):
     user: Mapped["User"] = relationship("User", back_populates="lesson_attempts")
     lesson: Mapped["Lesson"] = relationship("Lesson", back_populates="attempts")
 
+class LessonSession(Base):
+    __tablename__ = "lesson_sessions"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    lesson_id: Mapped[int] = mapped_column(Integer, ForeignKey("lessons.id"), nullable=False, index=True)
+    status: Mapped[str] = mapped_column(String(20), default="in_progress", nullable=False)
+    hearts_lost: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    started_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+    user: Mapped["User"] = relationship("User", overlaps="lesson_attempts")
+    lesson: Mapped["Lesson"] = relationship("Lesson", overlaps="attempts")
+
 
 class LeaderboardEntry(Base):
     __tablename__ = "leaderboard_entries"

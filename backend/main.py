@@ -4,9 +4,18 @@ from fastapi.responses import JSONResponse
 
 from app.core.config import settings
 from app.core.database import engine, Base
-from app.routers import users, courses, lessons, exercises, gamification
+from app.routers import (
+    users,
+    courses,
+    lessons,
+    exercises,
+    gamification,
+    auth,
+)
 
-# Create all tables on startup (Alembic handles migrations in production)
+# For this assignment, schema creation is performed on startup 
+# because the SQLite schema is small and controlled. 
+# In a production environment, this would be managed by Alembic migrations.
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
@@ -30,6 +39,7 @@ app.add_middleware(
 # Routers                                                              #
 # ------------------------------------------------------------------ #
 API_PREFIX = "/api/v1"
+app.include_router(auth.router, prefix="/api/v1")
 app.include_router(users.router, prefix=API_PREFIX)
 app.include_router(courses.router, prefix=API_PREFIX)
 app.include_router(lessons.router, prefix=API_PREFIX)

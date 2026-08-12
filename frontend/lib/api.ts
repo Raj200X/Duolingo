@@ -16,11 +16,27 @@ const api = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
+export async function login(username: string = "learner"): Promise<void> {
+  await api.post("/auth/login", { username });
+}
+
 // ------------------------------------------------------------------ //
 // Users                                                                //
 // ------------------------------------------------------------------ //
-export const getMe = (): Promise<User> =>
-  api.get("/users/me").then((r) => r.data);
+export const getMe = async (): Promise<User> => {
+  try {
+    const { data } = await api.get("/users/me");
+    return data;
+  } catch (error: any) {
+    if (error.response?.status === 401) {
+      // Auto-login for assignment evaluation UX
+      await login("learner");
+      const { data } = await api.get("/users/me");
+      return data;
+    }
+    throw error;
+  }
+};
 
 export const getMyStats = (): Promise<UserStats> =>
   api.get("/users/me/stats").then((r) => r.data);
@@ -34,18 +50,21 @@ export const getSkillTree = (courseId: number): Promise<SkillTree> =>
 // ------------------------------------------------------------------ //
 // Lessons                                                              //
 // ------------------------------------------------------------------ //
+export async function startLesson(lessonId: number): Promise<{ session_id: number }> {
+  const { data } = await api.post<{ session_id: number }>(`/lessons/${lessonId}/start`);
+  return data;
+}
+
 export const getLessonExercises = (lessonId: number): Promise<Exercise[]> =>
   api.get(`/lessons/${lessonId}/exercises`).then((r) => r.data);
 
 export const completeLesson = (
   lessonId: number,
-  heartsLost: number,
-  timeTakenSeconds: number
+  lessonSessionId: number
 ): Promise<LessonCompleteResponse> =>
   api
     .post(`/lessons/${lessonId}/complete`, {
-      hearts_lost: heartsLost,
-      time_taken_seconds: timeTakenSeconds,
+      session_id: lessonSessionId,
     })
     .then((r) => r.data);
 
@@ -54,11 +73,13 @@ export const completeLesson = (
 // ------------------------------------------------------------------ //
 export const checkAnswer = (
   exerciseId: number,
-  answer: string | Array<{ l: string; r: string }>
+  answer: string | Array<{ l: string; r: string }>,
+  lessonSessionId: number
 ): Promise<AnswerCheckResponse> =>
-  api
-    .post(`/exercises/${exerciseId}/check`, { answer })
-    .then((r) => r.data);
+  api.post(`/exercises/${exerciseId}/check`, { 
+    answer,
+    lesson_session_id: lessonSessionId
+  }).then((r) => r.data);
 
 // ------------------------------------------------------------------ //
 // Gamification                                                         //

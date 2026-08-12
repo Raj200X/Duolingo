@@ -3,23 +3,41 @@ from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.core.database import get_db
-from app.models.user import User
+from datetime import datetime, timezone
+from app.models.user import User, UserSession
 
 
 def get_current_user(
     db: Session = Depends(get_db),
-    user_id: int | None = Cookie(default=None),
+    session_id: str | None = Cookie(default=None),
 ) -> User:
     """
-    Simplified auth dependency.
-    Reads user_id from HttpOnly cookie. Falls back to the default seeded user.
-    Replacing this one function is all that's needed to add real authentication.
+    Validates the session_id from the HttpOnly cookie.
+    Ensures the session hasn't expired.
     """
-    uid = user_id if user_id is not None else settings.DEFAULT_USER_ID
-    user = db.query(User).filter(User.id == uid).first()
-    if not user:
+    if not session_id:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User not found. Ensure the database is seeded.",
+            detail="Not authenticated",
         )
-    return user
+
+    user_session = db.query(UserSession).filter(UserSession.session_id == session_id).first()
+    
+    if not user_session:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid session",
+        )
+        
+    if user_session.expires_at.tzinfo is None:
+        expires = user_session.expires_at.replace(tzinfo=timezone.utc)
+    else:
+        expires = user_session.expires_at
+        
+    if expires < datetime.now(timezone.utc):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Session expired",
+        )
+
+    return user_session.user

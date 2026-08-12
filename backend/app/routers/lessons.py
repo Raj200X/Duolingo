@@ -6,7 +6,8 @@ from app.core.database import get_db
 from app.core.dependencies import get_current_user
 from app.models.user import User
 from app.models.course import Lesson, Exercise
-from app.schemas.course import ExercisePublic, LessonCompleteRequest, LessonCompleteResponse
+from app.models.progress import LessonSession
+from app.schemas.course import ExercisePublic, LessonCompleteRequest, LessonCompleteResponse, StartLessonResponse
 from app.services.gamification import GamificationService
 
 router = APIRouter(prefix="/lessons", tags=["lessons"])
@@ -51,6 +52,23 @@ def get_exercises(
     return [_serialize_exercise(ex) for ex in exercises]
 
 
+@router.post("/{lesson_id}/start", response_model=StartLessonResponse)
+def start_lesson(
+    lesson_id: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    lesson = db.query(Lesson).filter(Lesson.id == lesson_id).first()
+    if not lesson:
+        raise HTTPException(status_code=404, detail="Lesson not found")
+
+    session = LessonSession(user_id=user.id, lesson_id=lesson.id)
+    db.add(session)
+    db.commit()
+    db.refresh(session)
+    return StartLessonResponse(session_id=session.id)
+
+
 @router.post("/{lesson_id}/complete", response_model=LessonCompleteResponse)
 def complete_lesson(
     lesson_id: int,
@@ -62,10 +80,22 @@ def complete_lesson(
     if not lesson:
         raise HTTPException(status_code=404, detail="Lesson not found")
 
+    session = db.query(LessonSession).filter(
+        LessonSession.id == payload.session_id,
+        LessonSession.user_id == user.id,
+        LessonSession.lesson_id == lesson_id
+    ).first()
+    
+    if not session:
+        raise HTTPException(status_code=404, detail="Lesson session not found or unauthorized")
+
     svc = GamificationService(db)
-    return svc.complete_lesson(
-        user=user,
-        lesson=lesson,
-        hearts_lost=payload.hearts_lost,
-        time_taken_seconds=payload.time_taken_seconds,
-    )
+    try:
+        response = svc.complete_lesson(
+            user=user,
+            lesson_session=session,
+        )
+        db.commit()
+        return response
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))

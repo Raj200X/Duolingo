@@ -1,5 +1,5 @@
 from datetime import datetime, date
-from sqlalchemy import Integer, String, DateTime, Date, Boolean, func
+from sqlalchemy import Integer, String, DateTime, Date, Boolean, ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
@@ -34,6 +34,19 @@ class User(Base):
     leaderboard_entries: Mapped[list["LeaderboardEntry"]] = relationship(
         "LeaderboardEntry", back_populates="user", lazy="select"
     )
+    sessions: Mapped[list["UserSession"]] = relationship(
+        "UserSession", back_populates="user", lazy="select", cascade="all, delete-orphan"
+    )
+
+class UserSession(Base):
+    __tablename__ = "user_sessions"
+
+    session_id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+
+    user: Mapped["User"] = relationship("User", back_populates="sessions")
 
 
 # Import here to avoid circular imports

@@ -6,6 +6,7 @@ from app.core.database import get_db
 from app.core.dependencies import get_current_user
 from app.models.user import User
 from app.models.course import Exercise
+from app.models.progress import LessonSession
 from app.schemas.course import AnswerCheckRequest, AnswerCheckResponse
 from app.services.gamification import GamificationService
 
@@ -23,8 +24,17 @@ def check_answer(
     if not exercise:
         raise HTTPException(status_code=404, detail="Exercise not found")
 
+    session = db.query(LessonSession).filter(
+        LessonSession.id == payload.lesson_session_id,
+        LessonSession.user_id == user.id,
+        LessonSession.status == "in_progress"
+    ).first()
+
+    if not session:
+        raise HTTPException(status_code=404, detail="Active lesson session not found")
+
     svc = GamificationService(db)
-    is_correct, correct_answer = svc.check_answer(exercise, payload.answer, user)
+    is_correct, correct_answer = svc.check_answer(exercise, payload.answer, user, session)
 
     # Commit the heart update (if wrong)
     db.commit()

@@ -3,12 +3,12 @@ GamificationService: handles streak, XP, hearts, and leaderboard.
 All gamification state transitions are atomic DB updates.
 """
 import json
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.models.user import User
-from app.models.progress import LeaderboardEntry, UserSkillProgress, LessonAttempt
+from app.models.progress import LessonSession, LeaderboardEntry, UserSkillProgress, LessonAttempt
 from app.models.course import Lesson, Skill
 from app.schemas.gamification import (
     LeaderboardResponse,
@@ -108,7 +108,7 @@ class GamificationService:
         if user.last_wrong_answer_at is None:
             return user.hearts
 
-        elapsed_minutes = (datetime.utcnow() - user.last_wrong_answer_at).total_seconds() / 60
+        elapsed_minutes = (datetime.now(timezone.utc) - user.last_wrong_answer_at).total_seconds() / 60
         regen = int(elapsed_minutes // settings.HEART_REGEN_MINUTES)
         return min(settings.HEARTS_MAX, user.hearts + regen)
 
@@ -119,7 +119,7 @@ class GamificationService:
         user.hearts = current
         if user.hearts > 0:
             user.hearts -= 1
-            user.last_wrong_answer_at = datetime.utcnow()
+            user.last_wrong_answer_at = datetime.now(timezone.utc)
         self.db.flush()
         return user.hearts
 
@@ -137,21 +137,23 @@ class GamificationService:
     def complete_lesson(
         self,
         user: User,
-        lesson: Lesson,
-        hearts_lost: int,
-        time_taken_seconds: int,
+        lesson_session: LessonSession,
     ) -> LessonCompleteResponse:
         """
         Atomic lesson completion:
+        0. Check session idempotency
         1. Update streak
         2. Calculate and award XP
-        3. Decrement hearts (already done per-question, just sync here)
-        4. Update skill progress (crowns)
-        5. Update leaderboard
-        6. Record LessonAttempt
+        3. Update skill progress (crowns)
+        4. Update leaderboard
+        5. Mark LessonSession as completed
         """
+        if lesson_session.status == "completed":
+            raise ValueError("Lesson already completed")
+
+        lesson = lesson_session.lesson
         skill = lesson.skill
-        base_xp, bonus_xp = self.calculate_xp(skill, hearts_lost)
+        base_xp, bonus_xp = self.calculate_xp(skill, lesson_session.hearts_lost)
         total_xp = base_xp + bonus_xp
 
         # Update streak
@@ -184,19 +186,13 @@ class GamificationService:
 
         if skill_progress.crowns < 5:
             skill_progress.crowns += 1
-        skill_progress.last_practiced = datetime.utcnow()
+        skill_progress.last_practiced = datetime.now(timezone.utc)
         if skill_progress.crowns >= skill.total_lessons:
             skill_progress.completed = True
 
-        # Record lesson attempt
-        attempt = LessonAttempt(
-            user_id=user.id,
-            lesson_id=lesson.id,
-            xp_earned=total_xp,
-            completed=True,
-            completed_at=datetime.utcnow(),
-        )
-        self.db.add(attempt)
+        # Mark session completed
+        lesson_session.status = "completed"
+        lesson_session.completed_at = datetime.now(timezone.utc)
 
         # Update leaderboard
         week_start = self._get_week_start()
@@ -273,6 +269,7 @@ class GamificationService:
         exercise,
         answer: str | list,
         user: User,
+        lesson_session: LessonSession,
     ) -> tuple[bool, str | list]:
         """
         Validates answer server-side. Never sends correct_answer to client before this call.
@@ -289,6 +286,9 @@ class GamificationService:
             def sort_pairs(pairs):
                 return sorted(pairs, key=lambda x: x.get("l", ""))
             is_correct = sort_pairs(answer) == sort_pairs(correct)
+            if not is_correct:
+                self.decrement_hearts(user)
+                lesson_session.hearts_lost += 1
             return is_correct, correct
 
         # All other types: string comparison
@@ -299,5 +299,6 @@ class GamificationService:
         if not is_correct:
             # Decrement hearts for wrong answer
             self.decrement_hearts(user)
+            lesson_session.hearts_lost += 1
 
         return is_correct, correct_str
