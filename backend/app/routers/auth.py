@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime, timedelta, timezone
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status, Cookie
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
@@ -44,11 +44,13 @@ def login(
     db.add(user_session)
     db.commit()
 
+    from app.core.config import settings
     # Set HttpOnly cookie
     response.set_cookie(
         key="session_id",
         value=session_id,
         httponly=True,
+        secure=not settings.DEBUG,
         samesite="lax",
         max_age=7 * 24 * 60 * 60,  # 7 days in seconds
     )
@@ -61,6 +63,22 @@ def login(
     )
 
 @router.post("/logout")
-def logout(response: Response):
-    response.delete_cookie(key="session_id")
+def logout(
+    response: Response,
+    db: Session = Depends(get_db),
+    session_id: str | None = Cookie(default=None)
+):
+    if session_id:
+        session = db.query(UserSession).filter(UserSession.session_id == session_id).first()
+        if session:
+            db.delete(session)
+            db.commit()
+    
+    from app.core.config import settings
+    response.delete_cookie(
+        key="session_id",
+        httponly=True,
+        secure=not settings.DEBUG,
+        samesite="lax",
+    )
     return {"message": "Logged out"}

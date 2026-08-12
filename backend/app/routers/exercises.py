@@ -33,6 +33,9 @@ def check_answer(
     if not session:
         raise HTTPException(status_code=404, detail="Active lesson session not found")
 
+    if exercise.lesson_id != session.lesson_id:
+        raise HTTPException(status_code=400, detail="Exercise does not belong to the active lesson session")
+
     svc = GamificationService(db)
     is_correct, correct_answer = svc.check_answer(exercise, payload.answer, user, session)
 
