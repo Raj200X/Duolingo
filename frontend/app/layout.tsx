@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "./providers";
+import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { AppLayout } from "@/components/layout/AppLayout";
 
 export const metadata: Metadata = {
-  title: "Duolingo Clone — Learn Spanish",
-  description: "A Duolingo-inspired language learning app. Learn Spanish with gamified lessons, streaks, and XP.",
+  title: "Chamelo — Learn Languages",
+  description: "A premium language learning app with gamified lessons, streaks, and XP.",
 };
 
 export default function RootLayout({
@@ -23,11 +24,26 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap"
           rel="stylesheet"
         />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                let theme = localStorage.getItem('theme');
+                let isDark = theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                if (isDark) {
+                  document.documentElement.classList.add('dark');
+                }
+              } catch (_) {}
+            `,
+          }}
+        />
       </head>
       <body>
-        <Providers>
-          <AppLayout>{children}</AppLayout>
-        </Providers>
+        <ThemeProvider>
+          <Providers>
+            <AppLayout>{children}</AppLayout>
+          </Providers>
+        </ThemeProvider>
       </body>
     </html>
   );

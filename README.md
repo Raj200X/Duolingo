@@ -1,6 +1,6 @@
-# Duolingo Clone
+# Chamelo (Language Learning Platform)
 
-A production-quality Duolingo web-app clone built as part of the SDE Fullstack Assignment.
+A production-quality language learning web application built as part of an SDE Fullstack Assignment. Inspired by industry leaders like Duolingo, but built with a completely original UI/UX, brand identity, and custom-animated mascot (the Chamelo chameleon 🦎).
 
 ## Live Demo
 - **Frontend**: _[Deploy to Vercel and add URL here]_
@@ -13,7 +13,7 @@ A production-quality Duolingo web-app clone built as part of the SDE Fullstack A
 
 | Layer | Technology |
 |-------|-----------|
-| Frontend | Next.js 16 (TypeScript), Tailwind CSS, Zustand, TanStack Query |
+| Frontend | Next.js 14 (TypeScript), Tailwind CSS, Zustand, TanStack Query |
 | Backend | Python 3.12, FastAPI, SQLAlchemy 2.0 |
 | Database | SQLite (SQLAlchemy ORM — portable to PostgreSQL) |
 | Deployment | Vercel (frontend), Railway (backend + SQLite) |
@@ -138,30 +138,35 @@ App will be available at `http://localhost:3000`
 
 ## Core Features
 
-### 1. Learning Path / Skill Tree
+### 1. Original UI & Gamification
+- **Custom Mascot**: Features a fully-animated, original SVG React component (Chameleon) with dynamic states (idle, peeking, sleepy, celebrating, loading).
+- **Gamified Micro-interactions**: Includes CSS heart-break wobble animations, XP count-up sequences, and custom confetti bursts to provide high-quality feedback.
+- **Premium Design System**: Implements a strict, accessible design token system with full Dark Mode support and responsive layout.
+
+### 2. Learning Path / Skill Tree
 - Visual path of units and skills with lock/unlock progression
 - Completed / available / in-progress / locked states
 - Crown progress dots per skill (1 per lesson completed)
-- Zigzag layout matching Duolingo's path style
+- 3D-pressed nodes and Zigzag layout matching premium gamified apps
 - Daily XP goal progress bar
 
-### 2. Lesson Player
+### 3. Lesson Player
 - 5 exercise types: Multiple Choice, Translate Word Bank, Match Pairs, Fill in the Blank, Type Answer
 - Immediate correct/incorrect feedback bar with correct answer display
+- Strict 3D button physics (pressed states and translations)
 - Progress bar across the lesson
 - Web Speech API audio on TypeAnswer exercises
-- Hearts: lose 1 per wrong answer (tracked server-side)
+- Hearts: lose 1 per wrong answer (tracked securely server-side)
 
-### 3. Gamification
+### 4. Gamification & Backend Security
+- Server-side Session Management: Real sessions tracked via secure HttpOnly cookies, protecting against replay attacks.
+- Secure Gamification Tracking: All XP calculations, heart deductions, and streak logic are enforced server-side.
 - Streak counter with day-based UTC logic
-- XP earned per lesson + bonus for perfect (no hearts lost)
 - Hearts: start at 5, regen 1 per 30 min, practice-refill resets to 5
-- Gems: mocked at 500
 - Weekly XP leaderboard with podium for top 3
 
-### 4. Profiles & Progress
+### 5. Profiles & Progress
 - Profile page: streak, XP, hearts, gems, skills/lessons completed
-- Achievement badges (6 achievements)
 - All progress persisted server-side per user
 
 ---

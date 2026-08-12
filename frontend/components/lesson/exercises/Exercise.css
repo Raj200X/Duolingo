@@ -1,0 +1,225 @@
+/* Base container for exercises */
+.exercise-container {
+  width: 100%;
+}
+
+/* =========================================
+   Multiple Choice Options
+   ========================================= */
+.mc-options {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .mc-options {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.mc-option {
+  padding: var(--space-4) var(--space-6);
+  border: 2px solid var(--border-light);
+  border-bottom: 4px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  font-weight: 700;
+  font-size: 17px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s ease;
+  background: var(--bg-surface-elevated);
+  color: var(--text-main);
+  outline: none;
+}
+
+.mc-option:hover:not(.selected):not(.disabled) {
+  border-color: var(--color-secondary);
+  background: var(--bg-surface);
+  transform: translateY(-2px);
+  border-bottom-width: 6px;
+}
+
+.mc-option.selected {
+  border-color: var(--color-secondary);
+  background: var(--color-secondary-light);
+  color: var(--color-secondary-hover);
+  border-bottom-width: 2px;
+  transform: translateY(2px);
+}
+.dark .mc-option.selected {
+  color: var(--color-secondary);
+}
+
+.mc-option.correct {
+  border-color: var(--status-success);
+  background: var(--status-success-light);
+  color: var(--status-success-hover);
+}
+.dark .mc-option.correct {
+  color: var(--status-success);
+}
+
+.mc-option.incorrect {
+  border-color: var(--status-error);
+  background: var(--status-error-light);
+  color: var(--status-error-hover);
+}
+.dark .mc-option.incorrect {
+  color: var(--status-error);
+}
+
+/* =========================================
+   Word Bank & Translate
+   ========================================= */
+.wordbank-area {
+  min-height: 80px;
+  border: 2px dashed var(--border-strong);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: var(--space-2);
+  margin-bottom: var(--space-6);
+  background: var(--bg-surface);
+  width: 100%;
+  transition: border-color 0.2s;
+}
+
+.word-chip {
+  padding: var(--space-2) var(--space-4);
+  border: 2px solid var(--border-light);
+  border-bottom: 4px solid var(--border-light);
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  font-size: 17px;
+  cursor: pointer;
+  background: var(--bg-surface-elevated);
+  color: var(--text-main);
+  transition: all 0.1s ease;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.word-chip:hover:not(.used):not(:disabled) {
+  border-color: var(--color-secondary);
+  transform: translateY(-2px);
+  border-bottom-width: 6px;
+}
+
+.word-chip:active:not(.used):not(:disabled) {
+  transform: translateY(2px);
+  border-bottom-width: 2px;
+}
+
+.word-chip.used {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* =========================================
+   Match Pairs
+   ========================================= */
+.match-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  width: 100%;
+}
+
+.match-item {
+  padding: var(--space-4);
+  border: 2px solid var(--border-light);
+  border-bottom: 4px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  text-align: center;
+  background: var(--bg-surface-elevated);
+  color: var(--text-main);
+  transition: all 0.15s ease;
+}
+
+.match-item:hover:not(.matched):not(.selected):not(:disabled) {
+  border-color: var(--color-secondary);
+  background: var(--bg-surface);
+  transform: translateY(-2px);
+  border-bottom-width: 6px;
+}
+
+.match-item.selected {
+  border-color: var(--color-secondary);
+  background: var(--color-secondary-light);
+  color: var(--color-secondary-hover);
+  border-bottom-width: 2px;
+  transform: translateY(2px);
+}
+.dark .match-item.selected {
+  color: var(--color-secondary);
+}
+
+.match-item.matched {
+  border-color: var(--status-success);
+  background: var(--status-success-light);
+  color: var(--status-success-hover);
+  opacity: 0.5;
+  cursor: default;
+  border-bottom-width: 2px;
+  transform: translateY(2px);
+}
+.dark .match-item.matched {
+  color: var(--status-success);
+}
+
+.match-item.error {
+  border-color: var(--status-error);
+  background: var(--status-error-light);
+  color: var(--status-error-hover);
+  animation: shake 0.3s ease;
+}
+.dark .match-item.error {
+  color: var(--status-error);
+}
+
+/* =========================================
+   Fill Blank & Type Answer
+   ========================================= */
+.fill-blank-input, .type-answer-input {
+  border: 2px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4) var(--space-6);
+  font-size: 20px;
+  font-weight: 700;
+  font-family: var(--font-display);
+  width: 100%;
+  color: var(--text-main);
+  background: var(--bg-surface-elevated);
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.fill-blank-input:focus, .type-answer-input:focus {
+  border-color: var(--color-secondary);
+  box-shadow: 0 4px 0 var(--color-secondary-light);
+}
+
+.fill-blank-input.correct, .type-answer-input.correct {
+  border-color: var(--status-success);
+  background: var(--status-success-light);
+  color: var(--status-success-hover);
+}
+.dark .fill-blank-input.correct, .dark .type-answer-input.correct {
+  color: var(--status-success);
+}
+
+.fill-blank-input.incorrect, .type-answer-input.incorrect {
+  border-color: var(--status-error);
+  background: var(--status-error-light);
+  color: var(--status-error-hover);
+}
+.dark .fill-blank-input.incorrect, .dark .type-answer-input.incorrect {
+  color: var(--status-error);
+}

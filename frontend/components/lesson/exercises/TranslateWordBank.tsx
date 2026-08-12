@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { Exercise } from "@/types";
+import "./Exercise.css";
 
 interface TranslateWordBankProps {
   exercise: Exercise;

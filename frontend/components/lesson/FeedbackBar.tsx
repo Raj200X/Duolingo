@@ -1,11 +1,10 @@
-"use client";
-
-import { CheckCircle, XCircle } from "lucide-react";
-import type { FeedbackState } from "@/stores/lessonStore";
+import { Button } from "@/components/ui/Button";
+import { CheckCircle2, XCircle } from "lucide-react";
+import "./FeedbackBar.css";
 
 interface FeedbackBarProps {
-  state: FeedbackState;
-  correctAnswer?: string | null;
+  state: "idle" | "correct" | "incorrect";
+  correctAnswer?: string;
   onContinue: () => void;
 }
 
@@ -14,42 +13,33 @@ export function FeedbackBar({ state, correctAnswer, onContinue }: FeedbackBarPro
 
   const isCorrect = state === "correct";
 
-  // Speak the correct answer via Web Speech API on wrong answer
-  if (!isCorrect && correctAnswer && typeof window !== "undefined" && window.speechSynthesis) {
-    // Only speak once (guard by checking if speaking)
-  }
-
   return (
-    <div className={`feedback-bar ${isCorrect ? "correct" : "incorrect"}`}>
-      <div>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-          {isCorrect ? (
-            <CheckCircle size={24} color="var(--duo-green-dark)" />
-          ) : (
-            <XCircle size={24} color="var(--duo-red-dark)" />
-          )}
-          <span className="feedback-message">
-            {isCorrect ? "Correct! 🎉" : "Incorrect"}
-          </span>
-        </div>
-        {!isCorrect && correctAnswer && (
-          <div style={{ fontSize: 14, color: "var(--duo-red-dark)", fontWeight: 600 }}>
-            Correct answer:{" "}
-            <strong>
-              {typeof correctAnswer === "string"
-                ? correctAnswer
-                : JSON.stringify(correctAnswer)}
-            </strong>
+    <div className={`feedback-wrapper ${state}`}>
+      <div className="feedback-content">
+        <div className="feedback-message-area">
+          <div className="feedback-icon">
+            {isCorrect ? <CheckCircle2 size={32} /> : <XCircle size={32} />}
           </div>
-        )}
+          <div>
+            <h2 className="feedback-title">
+              {isCorrect ? "Excellent!" : "Correct solution:"}
+            </h2>
+            {!isCorrect && correctAnswer && (
+              <p className="feedback-correction">{correctAnswer}</p>
+            )}
+          </div>
+        </div>
+        
+        <div className="feedback-action">
+          <Button 
+            variant={isCorrect ? "primary" : "danger"} 
+            onClick={onContinue}
+            autoFocus
+          >
+            Continue
+          </Button>
+        </div>
       </div>
-      <button
-        className={`btn ${isCorrect ? "btn-primary" : "btn-danger"}`}
-        onClick={onContinue}
-        id="feedback-continue-btn"
-      >
-        Continue
-      </button>
     </div>
   );
 }

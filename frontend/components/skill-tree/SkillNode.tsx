@@ -2,6 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import type { Skill } from "@/types";
+import { Star, Lock, Crown } from "lucide-react";
+import "./SkillNode.css";
 
 interface SkillNodeProps {
   skill: Skill;
@@ -19,78 +21,49 @@ export function SkillNode({ skill, unitColor, firstLessonId }: SkillNodeProps) {
   }
 
   const crowns = skill.progress?.crowns ?? 0;
-  const totalDots = skill.total_lessons;
+  const isCompleted = skill.state === "completed";
+  const isLocked = skill.state === "locked";
+  const isActive = skill.state === "in_progress" || skill.state === "available";
 
-  // Choose circle color based on state
-  const circleColor =
-    skill.state === "completed"
-      ? "var(--duo-yellow)"
-      : skill.state === "in_progress"
-      ? unitColor
-      : skill.state === "available"
-      ? unitColor
-      : "var(--bg-secondary)";
-
-  const borderColor =
-    skill.state === "completed"
-      ? "var(--duo-yellow-dark)"
-      : skill.state === "available" || skill.state === "in_progress"
-      ? `color-mix(in srgb, ${unitColor} 70%, black)`
-      : "var(--border-dark)";
+  // Compute Colors
+  const bgColor = isCompleted ? "var(--status-warning)" : isActive ? unitColor : "var(--status-locked)";
+  // Determine icon
+  let IconElement = <span className="skill-emoji">{skill.icon || "⭐"}</span>;
+  if (isLocked) {
+    IconElement = <Lock size={32} className="skill-icon-locked" strokeWidth={2.5} />;
+  } else if (isCompleted) {
+    IconElement = <Star size={36} fill="white" color="white" strokeWidth={2} />;
+  }
 
   return (
-    <div className="skill-node" onClick={handleClick} style={{ cursor: isClickable ? "pointer" : "not-allowed" }}>
-      <div
-        className={`skill-circle ${skill.state}`}
-        style={{
-          background: circleColor,
-          borderColor: borderColor,
-          boxShadow: isClickable ? `0 5px 0 ${borderColor}` : `0 4px 0 var(--border-dark)`,
-        }}
-        title={skill.state === "locked" ? "Complete previous skill to unlock" : skill.title}
-      >
-        {skill.state === "locked" ? (
-          <span style={{ fontSize: 28, opacity: 0.4 }}>🔒</span>
-        ) : (
-          <span style={{ fontSize: 30 }}>{skill.icon || "⭐"}</span>
-        )}
-
-        {/* Star badge for completed */}
-        {skill.state === "completed" && (
-          <div
-            style={{
-              position: "absolute",
-              top: -4,
-              right: -4,
-              width: 24,
-              height: 24,
-              borderRadius: "50%",
-              background: "var(--duo-yellow)",
-              border: "2px solid white",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 12,
-            }}
-          >
-            ⭐
-          </div>
-        )}
-      </div>
-
-      <div className="skill-title">{skill.title}</div>
-
-      {/* Crown progress dots */}
-      {skill.state !== "locked" && (
-        <div className="crown-dots">
-          {Array.from({ length: totalDots }).map((_, i) => (
-            <div
-              key={i}
-              className={`crown-dot${i < crowns ? " filled" : ""}`}
-            />
-          ))}
+    <div 
+      className={`skill-node-wrapper ${skill.state}`} 
+      onClick={handleClick}
+      title={isLocked ? "Complete previous skill to unlock" : skill.title}
+    >
+      
+      {/* Floating Crown Badge */}
+      {!isLocked && crowns > 0 && (
+        <div className="skill-crown-badge">
+          <Crown size={14} fill="var(--status-warning)" color="var(--status-warning-hover)" />
+          <span>{crowns}</span>
         </div>
       )}
+
+      {/* Main Node */}
+      <div 
+        className="skill-node-circle"
+        style={{ 
+          "--node-color": bgColor,
+          "--node-shadow": isLocked ? "var(--border-strong)" : `color-mix(in srgb, ${bgColor} 70%, black)`
+        } as React.CSSProperties}
+      >
+        <div className="skill-node-content">
+          {IconElement}
+        </div>
+      </div>
+      
+      <div className="skill-node-title">{skill.title}</div>
     </div>
   );
 }

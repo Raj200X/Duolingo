@@ -42,7 +42,8 @@ def seed():
         unit1 = Unit(course_id=course.id, title="Basics", description="Start your Spanish journey", order_index=1, color_hex="#58CC02", icon="🌱")
         unit2 = Unit(course_id=course.id, title="Travel", description="Navigate the world in Spanish", order_index=2, color_hex="#1CB0F6", icon="✈️")
         unit3 = Unit(course_id=course.id, title="Family", description="Talk about your family", order_index=3, color_hex="#CE82FF", icon="👨‍👩‍👧")
-        db.add_all([unit1, unit2, unit3])
+        unit4 = Unit(course_id=course.id, title="Hobbies", description="Talk about what you love", order_index=4, color_hex="#FF9600", icon="🎸")
+        db.add_all([unit1, unit2, unit3, unit4])
         db.flush()
 
         # ------------------------------------------------------------------ #
@@ -335,6 +336,39 @@ def seed():
                      prompt="'Inteligente' means:",
                      correct_answer="Intelligent",
                      options=json.dumps(["Strong", "Fast", "Intelligent", "Brave"])),
+        ])
+
+        # --- Unit 4: Hobbies ---
+        skill_sports = Skill(unit_id=unit4.id, title="Sports", description="Talk about sports", order_index=1, icon="⚽", xp_per_lesson=15, total_lessons=1)
+        skill_music = Skill(unit_id=unit4.id, title="Music", description="Instruments and singing", order_index=2, icon="🎵", xp_per_lesson=15, total_lessons=1)
+        db.add_all([skill_sports, skill_music])
+        db.flush()
+
+        lesson_sports = Lesson(skill_id=skill_sports.id, title="Sports", order_index=1)
+        lesson_music = Lesson(skill_id=skill_music.id, title="Music", order_index=1)
+        db.add_all([lesson_sports, lesson_music])
+        db.flush()
+        
+        db.add_all([
+            Exercise(lesson_id=lesson_sports.id, type="multiple_choice", order_index=1,
+                     prompt="'El fútbol' means:",
+                     correct_answer="Soccer",
+                     options=json.dumps(["Basketball", "Soccer", "Tennis", "Baseball"])),
+            Exercise(lesson_id=lesson_sports.id, type="translate_wordbank", order_index=2,
+                     prompt="Translate: I play soccer",
+                     correct_answer="Yo juego al fútbol",
+                     options=json.dumps(["Yo", "juego", "al", "fútbol", "tenis", "gusta"])),
+        ])
+        
+        db.add_all([
+            Exercise(lesson_id=lesson_music.id, type="multiple_choice", order_index=1,
+                     prompt="'La guitarra' means:",
+                     correct_answer="The guitar",
+                     options=json.dumps(["The piano", "The guitar", "The drum", "The flute"])),
+            Exercise(lesson_id=lesson_music.id, type="translate_wordbank", order_index=2,
+                     prompt="Translate: I like music",
+                     correct_answer="Me gusta la música",
+                     options=json.dumps(["Me", "gusta", "la", "música", "cantar", "bailar"])),
         ])
 
         # ------------------------------------------------------------------ #

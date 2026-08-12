@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Exercise } from "@/types";
+import "./Exercise.css";
 
 interface Pair {
   l: string;

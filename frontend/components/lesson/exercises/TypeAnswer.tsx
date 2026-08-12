@@ -2,6 +2,7 @@
 
 import { useState, KeyboardEvent } from "react";
 import type { Exercise } from "@/types";
+import "./Exercise.css";
 
 interface TypeAnswerProps {
   exercise: Exercise;

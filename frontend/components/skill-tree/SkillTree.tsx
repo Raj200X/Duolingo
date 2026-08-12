@@ -5,6 +5,8 @@ import { getSkillTree } from "@/lib/api";
 import { SkillNode } from "./SkillNode";
 import { UnitBanner } from "./UnitBanner";
 import type { Skill, Unit } from "@/types";
+import ChameleonMascot from "@/components/ui/ChameleonMascot";
+import "./SkillTree.css";
 
 // Zigzag offset pattern for visual path
 const ZIGZAG_OFFSETS = [0, 60, 100, 60, 0, -60, -100, -60];
@@ -21,44 +23,42 @@ export function SkillTree({ courseId }: SkillTreeProps) {
 
   if (isLoading) return <SkillTreeSkeleton />;
   if (error || !data) return (
-    <div style={{ textAlign: "center", padding: 40, color: "var(--text-secondary)" }}>
+    <div className="flex flex-col items-center justify-center p-10 text-muted">
       <div style={{ fontSize: 48, marginBottom: 16 }}>😢</div>
-      <div style={{ fontWeight: 700 }}>Failed to load skill tree. Is the backend running?</div>
+      <div className="text-h3">Failed to load skill tree.</div>
     </div>
   );
 
   return (
-    <div className="skill-tree">
+    <div className="skill-tree-container animate-fade-in">
       {/* Course header */}
-      <div style={{ textAlign: "center", marginBottom: 8 }}>
-        <div style={{ fontSize: 48 }}>{data.course.flag_emoji}</div>
-        <h1 style={{ fontSize: 28, fontWeight: 900, color: "var(--text-primary)" }}>
+      <div className="course-header text-center" style={{ marginBottom: "var(--space-8)" }}>
+        <div style={{ fontSize: 64, animation: "popIn 0.5s ease" }}>{data.course.flag_emoji}</div>
+        <h1 className="text-h1" style={{ color: "var(--text-main)", marginTop: "var(--space-2)" }}>
           {data.course.name}
         </h1>
-        <p style={{ color: "var(--text-secondary)", fontWeight: 600, marginTop: 4 }}>
+        <p className="text-body" style={{ marginTop: "var(--space-2)" }}>
           {data.course.description}
         </p>
       </div>
 
       {data.units.map((unit, unitIndex) => {
-        // Find first lesson id for each skill (for navigation)
         return (
-          <div key={unit.id}>
+          <div key={unit.id} className="unit-section">
             <UnitBanner unit={unit} index={unitIndex} />
 
-            <div className="skill-path">
+            <div className="skill-path-container">
               {unit.skills.map((skill, skillIndex) => {
                 const offset = ZIGZAG_OFFSETS[skillIndex % ZIGZAG_OFFSETS.length];
-                // We'll load first lesson lazily — use skill id as proxy for lesson id
-                // The lesson IDs start at 1 and are in order in our seed
                 const firstLessonId = getFirstLessonId(skill, data.units, unitIndex, skillIndex);
 
                 return (
                   <div
                     key={skill.id}
+                    className="skill-path-node-wrapper"
                     style={{
                       transform: `translateX(${offset}px)`,
-                      transition: "transform 0.3s ease",
+                      zIndex: 1, // Above the SVG path
                     }}
                   >
                     <SkillNode
@@ -75,33 +75,30 @@ export function SkillTree({ courseId }: SkillTreeProps) {
       })}
 
       {/* Bottom mascot */}
-      <div style={{ textAlign: "center", padding: "40px 0 20px", color: "var(--text-muted)" }}>
-        <div style={{ fontSize: 48 }}>🦜</div>
-        <div style={{ fontWeight: 700, marginTop: 8 }}>You&apos;ve reached the end!</div>
-        <div style={{ fontSize: 13, marginTop: 4 }}>Practice completed skills to earn more XP</div>
+      <div className="text-center p-10 text-muted flex flex-col items-center">
+        <ChameleonMascot state="sleepy" size={120} />
+        <div className="text-h3" style={{ marginTop: "var(--space-4)" }}>You've reached the end!</div>
+        <div className="text-body" style={{ marginTop: "var(--space-2)" }}>Practice completed skills to earn more XP</div>
       </div>
     </div>
   );
 }
 
-// Maps skill → first lesson ID.
-// In our seeded data lesson IDs align with skill IDs (1-to-1 for single-lesson skills,
-// multi-lesson skills use the same id as the first lesson). Works for the seeded content.
 function getFirstLessonId(skill: Skill, _units: Unit[], _unitIndex: number, _skillIndex: number): number {
   return skill.id;
 }
 
 function SkillTreeSkeleton() {
   return (
-    <div className="skill-tree">
+    <div className="skill-tree-container">
       {[1, 2, 3].map((u) => (
-        <div key={u}>
-          <div style={{ height: 80, borderRadius: "var(--radius-lg)", background: "var(--bg-secondary)", marginBottom: 16, animation: "pulse 1.5s infinite" }} />
-          <div className="skill-path">
+        <div key={u} className="unit-section">
+          <div className="skeleton-banner" />
+          <div className="skill-path-container">
             {[1, 2, 3].map((s) => (
-              <div key={s} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
-                <div style={{ width: 80, height: 80, borderRadius: "50%", background: "var(--bg-secondary)", animation: "pulse 1.5s infinite" }} />
-                <div style={{ width: 60, height: 12, borderRadius: 6, background: "var(--bg-secondary)" }} />
+              <div key={s} className="skill-path-node-wrapper">
+                <div className="skeleton-node-circle" />
+                <div className="skeleton-node-text" />
               </div>
             ))}
           </div>

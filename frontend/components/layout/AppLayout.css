@@ -1,0 +1,35 @@
+.app-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  min-height: 100vh;
+}
+
+.app-main-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;
+  padding: var(--space-8);
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .app-layout {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .app-main-wrapper {
+    /* Leave room for the fixed bottom navigation bar */
+    padding-bottom: 80px; 
+  }
+  
+  .main-content {
+    padding: var(--space-4);
+  }
+}

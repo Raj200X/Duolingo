@@ -17,6 +17,11 @@ import { LessonCompleteModal } from "@/components/modals/LessonCompleteModal";
 import { OutOfHeartsModal } from "@/components/modals/OutOfHeartsModal";
 import type { LessonCompleteResponse, AnswerCheckResponse } from "@/types";
 
+import { ProgressBar } from "@/components/ui/ProgressBar";
+import { Button } from "@/components/ui/Button";
+import ChameleonMascot from "@/components/ui/ChameleonMascot";
+import "./LessonPlayer.css";
+
 interface LessonPlayerProps {
   lessonId: number;
 }
@@ -128,14 +133,14 @@ export function LessonPlayer({ lessonId }: LessonPlayerProps) {
       <div className="lesson-header">
         <button
           onClick={() => router.push("/learn")}
-          style={{ background: "none", border: "none", cursor: "pointer", padding: 4, color: "var(--text-muted)" }}
+          className="lesson-exit-btn"
           aria-label="Exit lesson"
         >
-          <X size={24} />
+          <X size={28} strokeWidth={2.5} />
         </button>
 
-        <div className="progress-bar-track">
-          <div className="progress-bar-fill" style={{ width: `${progress}%` }} />
+        <div style={{ flex: 1, padding: "0 var(--space-4)" }}>
+          <ProgressBar progress={progress} color="primary" />
         </div>
 
         <HeartsDisplay hearts={localHearts} />
@@ -143,25 +148,22 @@ export function LessonPlayer({ lessonId }: LessonPlayerProps) {
 
       {/* Exercise body */}
       <div className="lesson-body">
-        {/* Exercise counter */}
-        <div style={{ color: "var(--text-muted)", fontSize: 13, fontWeight: 700, marginBottom: 16, alignSelf: "flex-start" }}>
-          {store.currentIndex + 1} / {exercises.length}
-        </div>
-
         {currentExercise && (
-          <ExerciseRenderer
-            exercise={currentExercise}
-            onAnswer={handleAnswer}
-            disabled={isAnswered || isChecking}
-            correctAnswer={
-              store.lastFeedback
-                ? typeof store.lastFeedback.correct_answer === "string"
-                  ? store.lastFeedback.correct_answer
-                  : JSON.stringify(store.lastFeedback.correct_answer)
-                : undefined
-            }
-            userAnswer={lastAnswer ?? undefined}
-          />
+          <div key={currentExercise.id} className="exercise-content-area">
+            <ExerciseRenderer
+              exercise={currentExercise}
+              onAnswer={handleAnswer}
+              disabled={isAnswered || isChecking}
+              correctAnswer={
+                store.lastFeedback
+                  ? typeof store.lastFeedback.correct_answer === "string"
+                    ? store.lastFeedback.correct_answer
+                    : JSON.stringify(store.lastFeedback.correct_answer)
+                  : undefined
+              }
+              userAnswer={lastAnswer ?? undefined}
+            />
+          </div>
         )}
       </div>
 
@@ -256,16 +258,18 @@ function ExerciseRenderer({
         />
       );
     default:
-      return <div>Unknown exercise type</div>;
+      return <div className="text-body text-center">Unknown exercise type</div>;
   }
 }
 
 function LessonLoadingScreen() {
   return (
-    <div className="lesson-container" style={{ alignItems: "center", justifyContent: "center" }}>
-      <div style={{ textAlign: "center" }}>
-        <div style={{ fontSize: 64, animation: "bob 1s ease-in-out infinite" }}>🦜</div>
-        <div style={{ fontWeight: 700, color: "var(--text-secondary)", marginTop: 16 }}>
+    <div className="lesson-container flex-col items-center justify-center">
+      <div className="text-center">
+        <div style={{ marginBottom: "var(--space-4)" }}>
+          <ChameleonMascot state="loading" size={96} />
+        </div>
+        <div className="text-h3 text-muted" style={{ marginTop: "var(--space-4)" }}>
           Loading lesson...
         </div>
       </div>
@@ -275,13 +279,13 @@ function LessonLoadingScreen() {
 
 function LessonErrorScreen({ onBack }: { onBack: () => void }) {
   return (
-    <div className="lesson-container" style={{ alignItems: "center", justifyContent: "center" }}>
-      <div style={{ textAlign: "center" }}>
-        <div style={{ fontSize: 64 }}>😢</div>
-        <div style={{ fontWeight: 700, color: "var(--text-secondary)", margin: "16px 0" }}>
+    <div className="lesson-container flex-col items-center justify-center">
+      <div className="text-center p-8">
+        <div style={{ fontSize: 80, marginBottom: "var(--space-4)" }}>😢</div>
+        <div className="text-h2" style={{ marginBottom: "var(--space-6)" }}>
           Failed to load lesson
         </div>
-        <button className="btn btn-primary" onClick={onBack}>Back to Home</button>
+        <Button variant="primary" onClick={onBack}>Back to Home</Button>
       </div>
     </div>
   );

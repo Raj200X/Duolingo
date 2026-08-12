@@ -1,6 +1,9 @@
 "use client";
 
 import type { Unit } from "@/types";
+import { Button } from "../ui/Button";
+import "./UnitBanner.css";
+import { BookOpen } from "lucide-react";
 
 interface UnitBannerProps {
   unit: Unit;
@@ -8,22 +11,24 @@ interface UnitBannerProps {
 }
 
 export function UnitBanner({ unit, index }: UnitBannerProps) {
+  // Use a fallback color if not provided
+  const bgColor = unit.color_hex || "var(--brand-primary)";
+
   return (
-    <div
-      className="unit-banner"
-      style={{ background: unit.color_hex }}
-    >
-      <span style={{ fontSize: 32, lineHeight: 1 }}>{unit.icon || "📚"}</span>
-      <div>
-        <div style={{ fontSize: 12, fontWeight: 700, opacity: 0.85, textTransform: "uppercase", letterSpacing: "1px" }}>
-          Unit {index + 1}
+    <div className="unit-banner-container" style={{ backgroundColor: bgColor }}>
+      <div className="unit-banner-content">
+        <div className="unit-banner-text">
+          <h2 className="unit-banner-title">Unit {index + 1}</h2>
+          <h3 className="unit-banner-subtitle">{unit.title}</h3>
+          {unit.description && (
+            <p className="unit-banner-desc">{unit.description}</p>
+          )}
         </div>
-        <div style={{ fontSize: 20, fontWeight: 900 }}>{unit.title}</div>
-        {unit.description && (
-          <div style={{ fontSize: 13, opacity: 0.9, marginTop: 2, fontWeight: 600 }}>
-            {unit.description}
-          </div>
-        )}
+        
+        <Button variant="ghost" className="unit-banner-btn" style={{ color: bgColor }}>
+          <BookOpen size={20} strokeWidth={2.5} />
+          <span className="unit-banner-btn-text">Guidebook</span>
+        </Button>
       </div>
     </div>
   );

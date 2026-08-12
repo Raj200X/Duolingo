@@ -1,0 +1,80 @@
+.unit-banner {
+  background-color: var(--color-primary);
+  border-radius: var(--radius-xl);
+  padding: var(--space-5) var(--space-6);
+  color: var(--text-on-primary);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-8);
+  box-shadow: var(--elevation-floating);
+  position: relative;
+  overflow: hidden;
+}
+
+.unit-banner-container {
+  border-radius: var(--radius-xl);
+  padding: var(--space-4) var(--space-6);
+  margin-bottom: var(--space-6);
+  color: var(--text-on-primary);
+  box-shadow: 0 4px 0 rgba(0,0,0,0.15); /* Keep generic unit shadow */
+}
+
+.unit-banner-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.unit-banner-text {
+  flex: 1;
+}
+
+.unit-banner-title {
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: -0.2px;
+  margin-bottom: 2px;
+}
+
+.unit-banner-subtitle {
+  font-size: 15px;
+  font-weight: 700;
+  opacity: 0.95;
+  margin-bottom: 4px;
+}
+
+.unit-banner-desc {
+  font-size: 14px;
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+/* Custom styles for the ghost button specifically inside the unit banner */
+.unit-banner-btn {
+  /* Provide a solid background color on the content to punch through the unit color */
+}
+.unit-banner-btn .duo-btn-content {
+  background-color: rgba(255, 255, 255, 0.95);
+  padding: var(--space-2) var(--space-4);
+  font-size: 13px;
+  color: var(--text-main);
+}
+.dark .unit-banner-btn .duo-btn-content {
+  background-color: var(--bg-surface-elevated);
+  color: var(--text-main);
+}
+
+.unit-banner-btn:hover .duo-btn-content {
+  background-color: white;
+}
+.dark .unit-banner-btn:hover .duo-btn-content {
+  background-color: var(--bg-surface);
+}
+
+@media (max-width: 640px) {
+  .unit-banner-btn-text {
+    display: none; /* Hide text on small screens, keep icon */
+  }
+}

@@ -1,8 +1,11 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { LessonCompleteResponse } from "@/types";
+import { Button } from "@/components/ui/Button";
+import ChameleonMascot from "@/components/ui/ChameleonMascot";
+import "./Modals.css";
 
 interface LessonCompleteModalProps {
   result: LessonCompleteResponse;
@@ -25,60 +28,54 @@ export function LessonCompleteModal({ result, onClose }: LessonCompleteModalProp
       window.speechSynthesis.speak(utterance);
     }
 
-    // Simple confetti using CSS animation (canvas-confetti would need dynamic import)
     launchConfetti();
   }, []);
 
   return (
     <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="modal-card animate-pop">
+      <div className="modal-card">
         {/* Mascot */}
-        <div style={{ fontSize: 80, marginBottom: 8 }}>🦜</div>
+        <div style={{ marginBottom: "var(--space-2)", display: "flex", justifyContent: "center" }}>
+          <ChameleonMascot state="celebrating" size={120} />
+        </div>
 
-        <div className="modal-title" style={{ color: "var(--duo-green-dark)" }}>
+        <div className="modal-title" style={{ color: "var(--color-primary)" }}>
           Lesson Complete!
         </div>
         <div className="modal-subtitle">You&apos;re on a roll!</div>
 
         {/* XP Stats */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: 12,
-            margin: "24px 0",
-          }}
-        >
+        <div className="flex justify-between gap-4" style={{ margin: "var(--space-6) 0" }}>
           <StatChip
             icon="⚡"
             value={`+${result.xp_earned + result.bonus_xp}`}
             label="XP"
-            color="var(--duo-yellow)"
+            color="var(--color-secondary)"
           />
           <StatChip
             icon="🔥"
             value={String(result.streak_count)}
             label="Streak"
-            color="var(--duo-orange)"
+            color="var(--status-warning)"
           />
           <StatChip
             icon="❤️"
             value={String(result.hearts_remaining)}
             label="Hearts"
-            color="var(--duo-red)"
+            color="var(--status-error)"
           />
         </div>
 
         {result.bonus_xp > 0 && (
           <div
             style={{
-              background: "#d7ffb8",
+              background: "var(--color-primary-light)",
               borderRadius: "var(--radius-md)",
-              padding: "10px 16px",
-              marginBottom: 16,
+              padding: "12px 16px",
+              marginBottom: "var(--space-4)",
               fontWeight: 700,
-              color: "var(--duo-green-dark)",
-              fontSize: 14,
+              color: "var(--color-primary-hover)",
+              fontSize: 15,
             }}
           >
             🎯 Perfect lesson bonus: +{result.bonus_xp} XP!
@@ -88,46 +85,73 @@ export function LessonCompleteModal({ result, onClose }: LessonCompleteModalProp
         {result.skill_completed && (
           <div
             style={{
-              background: "#fff4cc",
+              background: "var(--status-warning-light)",
               borderRadius: "var(--radius-md)",
-              padding: "10px 16px",
-              marginBottom: 16,
+              padding: "12px 16px",
+              marginBottom: "var(--space-4)",
               fontWeight: 700,
-              color: "#8a6500",
-              fontSize: 14,
+              color: "var(--status-warning-hover)",
+              fontSize: 15,
             }}
           >
             ⭐ Skill completed! You earned a crown!
           </div>
         )}
 
-        <button
-          className="btn btn-primary"
-          style={{ width: "100%", marginTop: 8 }}
+        <Button
+          variant="primary"
+          style={{ width: "100%", marginTop: "var(--space-2)" }}
           onClick={() => { onClose(); router.push("/learn"); }}
           id="lesson-complete-continue"
         >
           Continue
-        </button>
+        </Button>
       </div>
     </div>
   );
 }
 
 function StatChip({ icon, value, label, color }: { icon: string; value: string; label: string; color: string }) {
+  const [displayValue, setDisplayValue] = useState(0);
+  const targetNumber = parseInt(value.replace(/[^0-9]/g, ""), 10) || 0;
+  const prefix = value.startsWith("+") ? "+" : "";
+
+  useEffect(() => {
+    let start = 0;
+    const duration = 1500; // 1.5 seconds
+    const interval = 30; // 30ms updates
+    const steps = duration / interval;
+    const increment = targetNumber / steps;
+
+    const timer = setInterval(() => {
+      start += increment;
+      if (start >= targetNumber) {
+        setDisplayValue(targetNumber);
+        clearInterval(timer);
+      } else {
+        setDisplayValue(Math.floor(start));
+      }
+    }, interval);
+
+    return () => clearInterval(timer);
+  }, [targetNumber]);
+
   return (
     <div
       style={{
-        background: "var(--bg-secondary)",
-        borderRadius: "var(--radius-md)",
-        padding: "12px 8px",
+        flex: 1,
+        background: "var(--bg-surface)",
+        borderRadius: "var(--radius-lg)",
+        padding: "var(--space-4) var(--space-2)",
         textAlign: "center",
-        border: "2px solid var(--border)",
+        border: "2px solid var(--border-light)",
       }}
     >
-      <div style={{ fontSize: 24 }}>{icon}</div>
-      <div style={{ fontWeight: 900, fontSize: 22, color }}>{value}</div>
-      <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase" }}>
+      <div style={{ fontSize: 28 }}>{icon}</div>
+      <div style={{ fontWeight: 900, fontSize: 24, color, margin: "4px 0" }}>
+        {prefix}{displayValue}
+      </div>
+      <div style={{ fontSize: 12, fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.5px" }}>
         {label}
       </div>
     </div>

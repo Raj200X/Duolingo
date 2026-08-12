@@ -108,7 +108,11 @@ class GamificationService:
         if user.last_wrong_answer_at is None:
             return user.hearts
 
-        elapsed_minutes = (datetime.now(timezone.utc) - user.last_wrong_answer_at).total_seconds() / 60
+        last_wrong = user.last_wrong_answer_at
+        if last_wrong.tzinfo is None:
+            last_wrong = last_wrong.replace(tzinfo=timezone.utc)
+
+        elapsed_minutes = (datetime.now(timezone.utc) - last_wrong).total_seconds() / 60
         regen = int(elapsed_minutes // settings.HEART_REGEN_MINUTES)
         return min(settings.HEARTS_MAX, user.hearts + regen)
 

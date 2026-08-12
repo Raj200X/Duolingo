@@ -2,11 +2,13 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { getLeaderboard } from "@/lib/api";
+import { Card } from "@/components/ui/Card";
+import "./Leaderboard.css";
 
 const RANK_COLORS: Record<number, string> = {
-  1: "#ffd700",
-  2: "#c0c0c0",
-  3: "#cd7f32",
+  1: "#FFC800", // Gold
+  2: "#C8D8E0", // Silver
+  3: "#cd7f32", // Bronze
 };
 
 export default function LeaderboardPage() {
@@ -19,28 +21,17 @@ export default function LeaderboardPage() {
   if (!data) return null;
 
   return (
-    <div>
-      <div style={{ marginBottom: 24 }}>
-        <h1 style={{ fontSize: 28, fontWeight: 900, color: "var(--text-primary)", marginBottom: 4 }}>
-          🏆 Leaderboard
-        </h1>
-        <div style={{ color: "var(--text-secondary)", fontWeight: 600, fontSize: 14 }}>
+    <div className="animate-fade-in pb-12">
+      <div className="mb-8">
+        <h1 className="text-h1">🏆 Leaderboard</h1>
+        <div className="text-body mt-2">
           Weekly XP — week of {new Date(data.week_start).toLocaleDateString("en-US", { month: "long", day: "numeric" })}
         </div>
       </div>
 
       {/* Top 3 podium */}
       {data.entries.length >= 3 && (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "flex-end",
-            justifyContent: "center",
-            gap: 12,
-            marginBottom: 32,
-            padding: "0 16px",
-          }}
-        >
+        <div className="podium-container">
           <PodiumBlock entry={data.entries[1]} place={2} height={100} />
           <PodiumBlock entry={data.entries[0]} place={1} height={130} />
           <PodiumBlock entry={data.entries[2]} place={3} height={80} />
@@ -48,26 +39,19 @@ export default function LeaderboardPage() {
       )}
 
       {/* Full list */}
-      <div
-        style={{
-          background: "var(--bg-card)",
-          border: "2px solid var(--border)",
-          borderRadius: "var(--radius-lg)",
-          overflow: "hidden",
-        }}
-      >
+      <Card padding="none" className="overflow-hidden">
         {data.entries.map((entry, idx) => (
           <div
             key={entry.user_id}
-            className={`leaderboard-row${entry.is_current_user ? " is-me" : ""}`}
-            style={{ borderBottom: idx < data.entries.length - 1 ? "1px solid var(--border)" : "none" }}
+            className={`leaderboard-row ${entry.is_current_user ? "is-me" : ""}`}
+            style={{ borderBottom: idx < data.entries.length - 1 ? "2px solid var(--border-light)" : "none" }}
           >
             {/* Rank badge */}
             <div
               className="rank-badge"
               style={{
-                background: RANK_COLORS[entry.rank] ?? "var(--bg-secondary)",
-                color: entry.rank <= 3 ? "#333" : "var(--text-secondary)",
+                background: RANK_COLORS[entry.rank] ?? "var(--bg-surface)",
+                color: entry.rank <= 3 ? "white" : "var(--text-muted)",
               }}
             >
               {entry.rank <= 3 ? ["🥇", "🥈", "🥉"][entry.rank - 1] : entry.rank}
@@ -75,56 +59,37 @@ export default function LeaderboardPage() {
 
             {/* Avatar */}
             <div
+              className="leaderboard-avatar"
               style={{
-                width: 44,
-                height: 44,
-                borderRadius: "50%",
                 background: `hsl(${(entry.user_id * 60) % 360}, 70%, 60%)`,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 20,
-                fontWeight: 800,
-                color: "white",
-                flexShrink: 0,
               }}
             >
               {entry.display_name.charAt(0)}
             </div>
 
             {/* Name */}
-            <div style={{ flex: 1 }}>
-              <div style={{ fontWeight: 800, fontSize: 15, color: "var(--text-primary)" }}>
+            <div className="flex-1">
+              <div className="text-body-strong">
                 {entry.display_name}
                 {entry.is_current_user && (
-                  <span
-                    style={{
-                      marginLeft: 8,
-                      fontSize: 11,
-                      fontWeight: 700,
-                      color: "var(--duo-green)",
-                      background: "#d7ffb8",
-                      padding: "2px 8px",
-                      borderRadius: "var(--radius-full)",
-                    }}
-                  >
-                    YOU
-                  </span>
+                  <span className="you-badge">YOU</span>
                 )}
               </div>
             </div>
 
             {/* XP */}
-            <div style={{ fontWeight: 900, fontSize: 16, color: "var(--duo-yellow)", textAlign: "right" }}>
-              {entry.xp_this_week.toLocaleString()}
-              <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)" }}>XP</div>
+            <div className="text-right">
+              <div className="text-h3" style={{ color: "var(--status-warning-hover)" }}>
+                {entry.xp_this_week.toLocaleString()}
+              </div>
+              <div className="text-label" style={{ color: "var(--text-disabled)" }}>XP</div>
             </div>
           </div>
         ))}
-      </div>
+      </Card>
 
       {data.entries.length === 0 && (
-        <div style={{ textAlign: "center", padding: 40, color: "var(--text-muted)", fontWeight: 600 }}>
+        <div className="text-center p-10 text-muted text-body-strong">
           No leaderboard data yet. Complete a lesson to appear here!
         </div>
       )}
@@ -142,45 +107,27 @@ interface PodiumEntry {
 function PodiumBlock({ entry, place, height }: { entry: PodiumEntry; place: number; height: number }) {
   const medals = ["🥇", "🥈", "🥉"];
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flex: 1 }}>
+    <div className="podium-block">
       <div
+        className="podium-avatar"
         style={{
-          width: 56,
-          height: 56,
-          borderRadius: "50%",
           background: `hsl(${(entry.user_id * 60) % 360}, 70%, 60%)`,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontSize: 24,
-          fontWeight: 900,
-          color: "white",
-          marginBottom: 8,
-          border: `3px solid ${RANK_COLORS[place]}`,
+          borderColor: RANK_COLORS[place],
           boxShadow: `0 4px 0 ${RANK_COLORS[place]}`,
         }}
       >
         {entry.display_name.charAt(0)}
       </div>
-      <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-secondary)", marginBottom: 4, textAlign: "center" }}>
-        {entry.display_name}
-      </div>
+      <div className="podium-name">{entry.display_name}</div>
       <div
+        className="podium-pillar"
         style={{
           background: RANK_COLORS[place],
-          width: "100%",
           height,
-          borderRadius: "var(--radius-md) var(--radius-md) 0 0",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          color: "#333",
-          fontWeight: 900,
         }}
       >
-        <div style={{ fontSize: 20 }}>{medals[place - 1]}</div>
-        <div style={{ fontSize: 14 }}>{entry.xp_this_week}</div>
+        <div style={{ fontSize: 24 }}>{medals[place - 1]}</div>
+        <div style={{ fontSize: 15, fontWeight: 900 }}>{entry.xp_this_week}</div>
       </div>
     </div>
   );
@@ -188,18 +135,18 @@ function PodiumBlock({ entry, place, height }: { entry: PodiumEntry; place: numb
 
 function LeaderboardSkeleton() {
   return (
-    <div>
-      <div style={{ width: 200, height: 32, background: "var(--bg-secondary)", borderRadius: 8, marginBottom: 24, animation: "pulse 1.5s infinite" }} />
-      <div style={{ background: "var(--bg-card)", border: "2px solid var(--border)", borderRadius: "var(--radius-lg)", overflow: "hidden" }}>
+    <div className="animate-pulse">
+      <div style={{ width: 200, height: 32, background: "var(--bg-surface)", borderRadius: 8, marginBottom: 24 }} />
+      <Card padding="none">
         {[...Array(5)].map((_, i) => (
-          <div key={i} style={{ display: "flex", gap: 16, padding: "14px 16px", borderBottom: "1px solid var(--border)" }}>
-            <div style={{ width: 32, height: 32, borderRadius: "50%", background: "var(--bg-secondary)", animation: "pulse 1.5s infinite" }} />
-            <div style={{ width: 44, height: 44, borderRadius: "50%", background: "var(--bg-secondary)", animation: "pulse 1.5s infinite" }} />
-            <div style={{ flex: 1, height: 20, borderRadius: 4, background: "var(--bg-secondary)", animation: "pulse 1.5s infinite" }} />
-            <div style={{ width: 60, height: 20, borderRadius: 4, background: "var(--bg-secondary)", animation: "pulse 1.5s infinite" }} />
+          <div key={i} className="flex items-center p-4 border-b-2" style={{ borderColor: "var(--border-light)", gap: 16 }}>
+            <div style={{ width: 32, height: 32, borderRadius: "50%", background: "var(--bg-surface)" }} />
+            <div style={{ width: 44, height: 44, borderRadius: "50%", background: "var(--bg-surface)" }} />
+            <div style={{ flex: 1, height: 20, borderRadius: 4, background: "var(--bg-surface)" }} />
+            <div style={{ width: 60, height: 20, borderRadius: 4, background: "var(--bg-surface)" }} />
           </div>
         ))}
-      </div>
+      </Card>
     </div>
   );
 }

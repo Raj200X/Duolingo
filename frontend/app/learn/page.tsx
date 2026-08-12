@@ -12,37 +12,26 @@ export default function LearnPage() {
     <div>
       {/* Daily XP progress bar */}
       {streak && user && (
-        <div
-          style={{
-            background: "var(--bg-card)",
-            border: "2px solid var(--border)",
-            borderRadius: "var(--radius-lg)",
-            padding: "16px 20px",
-            marginBottom: 24,
-            display: "flex",
-            alignItems: "center",
-            gap: 16,
-          }}
-        >
-          <span style={{ fontSize: 28 }}>⚡</span>
+        <div className="duo-card duo-card-p-md" style={{ marginBottom: "var(--space-6)", display: "flex", alignItems: "center", gap: "var(--space-4)" }}>
+          <span style={{ fontSize: 32 }}>⚡</span>
           <div style={{ flex: 1 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-              <span style={{ fontWeight: 800, fontSize: 14, color: "var(--text-secondary)" }}>
-                Daily Goal
-              </span>
-              <span style={{ fontWeight: 800, fontSize: 14, color: "var(--duo-green)" }}>
+            <div className="flex justify-between items-center" style={{ marginBottom: "var(--space-2)" }}>
+              <span className="text-label text-muted">Daily Goal</span>
+              <span className="text-label" style={{ color: "var(--brand-primary)" }}>
                 {streak.daily_xp_earned} / {streak.daily_xp_goal} XP
               </span>
             </div>
-            <div className="xp-bar-track">
+            <div className="duo-progress-track">
               <div
-                className="xp-bar-fill"
+                className="duo-progress-fill duo-progress-fill-primary"
                 style={{ width: `${Math.min(100, streak.daily_xp_progress_pct)}%` }}
-              />
+              >
+                <div className="duo-progress-highlight" />
+              </div>
             </div>
           </div>
           {streak.daily_xp_progress_pct >= 100 && (
-            <span style={{ fontSize: 24 }}>✅</span>
+            <span style={{ fontSize: 24 }} className="animate-pop-in">✅</span>
           )}
         </div>
       )}

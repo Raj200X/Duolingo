@@ -2,6 +2,8 @@
 
 import { usePathname } from "next/navigation";
 import { Sidebar } from "./Sidebar";
+import { TopStatBar } from "./TopStatBar";
+import "./AppLayout.css";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -19,7 +21,10 @@ export function AppLayout({ children }: AppLayoutProps) {
   return (
     <div className="app-layout">
       <Sidebar />
-      <main className="main-content">{children}</main>
+      <div className="app-main-wrapper">
+        <TopStatBar />
+        <main className="main-content">{children}</main>
+      </div>
     </div>
   );
 }
