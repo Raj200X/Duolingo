@@ -1,8 +1,10 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import { getMyStats } from "@/lib/api";
 import { Card } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { ThemeSwitcher } from "@/components/theme/ThemeSwitcher";
 import "./Profile.css";
@@ -10,6 +12,13 @@ import "./Profile.css";
 import ChameleonMascot from "@/components/ui/ChameleonMascot";
 
 export default function ProfilePage() {
+  const router = useRouter();
+
+  const handleLogout = () => {
+    document.cookie = "chamelo_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    router.push("/");
+  };
+
   const { data: stats, isLoading } = useQuery({
     queryKey: ["user", "stats"],
     queryFn: getMyStats,
@@ -21,7 +30,7 @@ export default function ProfilePage() {
   return (
     <div className="animate-fade-in pb-12">
       {/* Header */}
-      <div className="profile-header">
+      <div className="profile-header relative">
         <div className="profile-avatar-container">
           <div className="profile-avatar" style={{ overflow: "hidden", display: "flex", justifyContent: "center", alignItems: "flex-end", backgroundColor: "var(--bg-surface)" }}>
             <ChameleonMascot state="idle" size={96} />

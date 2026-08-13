@@ -2,6 +2,7 @@
 
 import type { Unit } from "@/types";
 import { Button } from "../ui/Button";
+import Link from "next/link";
 import "./UnitBanner.css";
 import { BookOpen } from "lucide-react";
 
@@ -25,10 +26,12 @@ export function UnitBanner({ unit, index }: UnitBannerProps) {
           )}
         </div>
         
-        <Button variant="ghost" className="unit-banner-btn" style={{ color: bgColor }}>
-          <BookOpen size={20} strokeWidth={2.5} />
-          <span className="unit-banner-btn-text">Guidebook</span>
-        </Button>
+        <Link href={`/guidebook/${unit.id}`}>
+          <Button variant="ghost" className="unit-banner-btn" style={{ color: bgColor }}>
+            <BookOpen size={20} strokeWidth={2.5} />
+            <span className="unit-banner-btn-text">Guidebook</span>
+          </Button>
+        </Link>
       </div>
     </div>
   );

@@ -1,7 +1,13 @@
-.duo-btn-container {
+.duo-btn {
   display: inline-block;
   position: relative;
   width: 100%;
+  border: none;
+  padding: 0;
+  outline: none;
+  cursor: pointer;
+  background: none;
+  border-radius: 16px;
 }
 
 .duo-btn-content {
@@ -22,12 +28,6 @@
   touch-action: manipulation;
   outline: none;
   border: 2px solid transparent;
-}
-
-/* Base button wrapper that provides the 3D shadow color */
-.duo-btn-wrapper {
-  border-radius: 16px;
-  width: 100%;
 }
 
 /* Primary Variant */
@@ -96,10 +96,10 @@
 }
 
 /* Disabled State */
-.duo-btn-wrapper:disabled {
+.duo-btn:disabled {
   cursor: not-allowed;
   opacity: 0.6;
 }
-.duo-btn-wrapper:disabled .duo-btn-content {
+.duo-btn:disabled .duo-btn-content {
   transform: translateY(0);
 }

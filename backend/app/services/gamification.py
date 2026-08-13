@@ -198,6 +198,17 @@ class GamificationService:
         lesson_session.status = "completed"
         lesson_session.completed_at = datetime.now(timezone.utc)
 
+        # Record attempt for daily XP aggregation
+        attempt = LessonAttempt(
+            user_id=user.id,
+            lesson_id=lesson.id,
+            xp_earned=total_xp,
+            completed=True,
+            started_at=lesson_session.started_at,
+            completed_at=lesson_session.completed_at,
+        )
+        self.db.add(attempt)
+
         # Update leaderboard
         week_start = self._get_week_start()
         lb_entry = (

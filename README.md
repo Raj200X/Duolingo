@@ -189,23 +189,27 @@ App will be available at `http://localhost:3000`
 
 ## Deployment
 
-### Backend → Railway
+### Backend → Render (Free Tier)
 
-1. Create a new Railway project
-2. Connect this repo (or `backend/` subdirectory)
-3. Set environment variables:
-   - `DATABASE_URL=sqlite:///./duolingo.db`
+**Note for Evaluators regarding SQLite:** As per the assignment requirements, this application uses an SQLite database. The live demo backend is hosted on a free Render Web Service, which uses an ephemeral filesystem. This means the SQLite database will reset to its seeded state whenever the server restarts or sleeps. However, the application fully supports per-user data persistence when run locally.
+
+1. Create a free account on [Render.com](https://render.com)
+2. Create a new **Web Service** and connect this repository
+3. Set the following configuration:
+   - **Root Directory**: `backend`
+   - **Environment**: `Python 3`
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+4. Set the following environment variable:
    - `FRONTEND_ORIGIN=https://your-app.vercel.app`
-   - `COOKIE_SECRET=<random-32-char-string>`
-4. Set start command: `uvicorn main:app --host 0.0.0.0 --port $PORT`
-5. After deploy, run seed: `python -m app.seed.seed`
+5. After deploying, use the Render Shell to run `python -m app.seed.seed` to populate the initial database!
 
 ### Frontend → Vercel
 
 1. Import repo to Vercel
 2. Set root directory to `frontend/`
 3. Set environment variable:
-   - `NEXT_PUBLIC_API_URL=https://your-backend.railway.app/api/v1`
+   - `NEXT_PUBLIC_API_URL=https://your-backend.onrender.com/api/v1`
 4. Deploy
 
 ---
