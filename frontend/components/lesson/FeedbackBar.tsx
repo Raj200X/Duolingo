@@ -3,7 +3,7 @@ import { CheckCircle2, XCircle } from "lucide-react";
 import "./FeedbackBar.css";
 
 interface FeedbackBarProps {
-  state: "idle" | "correct" | "incorrect";
+  state: "idle" | "correct" | "incorrect" | "completed";
   correctAnswer?: string;
   onContinue: () => void;
 }

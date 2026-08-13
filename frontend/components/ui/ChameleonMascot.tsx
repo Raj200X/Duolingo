@@ -222,11 +222,11 @@ function Character({ bodyId, headId, tailId, mouth, leftEye, rightEye, browRaise
       <circle cx="138" cy="168" r="2.2" fill={PALETTE.shadow} opacity="0.6" />
       <circle cx="162" cy="168" r="2.2" fill={PALETTE.shadow} opacity="0.6" />
 
-      <Brow cx="112" cy="98" width="42" raised={browRaisedLeft} />
-      <Brow cx="188" cy="98" width="42" raised={browRaisedRight} />
+      <Brow cx={112} cy={98} width={42} raised={browRaisedLeft} />
+      <Brow cx={188} cy={98} width={42} raised={browRaisedRight} />
 
-      <Eye cx="112" cy="128" r="30" mode={leftEye} shineDir={1} />
-      <Eye cx="188" cy="128" r="30" mode={rightEye} shineDir={-1} />
+      <Eye cx={112} cy={128} r={30} mode={leftEye} shineDir={1} />
+      <Eye cx={188} cy={128} r={30} mode={rightEye} shineDir={-1} />
 
       <ellipse cx="88" cy="160" rx="10" ry="7" fill={PALETTE.accent} opacity="0.3" />
       <ellipse cx="212" cy="160" rx="10" ry="7" fill={PALETTE.accent} opacity="0.3" />

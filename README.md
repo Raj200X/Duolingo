@@ -199,10 +199,9 @@ App will be available at `http://localhost:3000`
    - **Root Directory**: `backend`
    - **Environment**: `Python 3`
    - **Build Command**: `pip install -r requirements.txt`
-   - **Start Command**: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+   - **Start Command**: `python -m app.seed.seed && uvicorn main:app --host 0.0.0.0 --port $PORT`
 4. Set the following environment variable:
    - `FRONTEND_ORIGIN=https://your-app.vercel.app`
-5. After deploying, use the Render Shell to run `python -m app.seed.seed` to populate the initial database!
 
 ### Frontend → Vercel
 
