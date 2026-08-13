@@ -30,3 +30,4 @@ backend/duolingo.db
 *.pem
 .vscode/
 .idea/
+cookies.txt

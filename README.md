@@ -1,11 +1,11 @@
 # Chamelo (Language Learning Platform)
 
-A production-quality language learning web application built as part of an SDE Fullstack Assignment. Inspired by industry leaders like Duolingo, but built with a completely original UI/UX, brand identity, and custom-animated mascot (the Chamelo chameleon 🦎).
+A production-oriented language learning web application built as part of an SDE Fullstack Assignment. Inspired by industry leaders like Duolingo, but built with a completely original UI/UX, brand identity, and custom-animated mascot (the Chamelo chameleon 🦎).
 
 ## Live Demo
-- **Frontend**: _[Deploy to Vercel and add URL here]_
-- **Backend API**: _[Deploy to Railway and add URL here]_
-- **API Docs**: `<backend-url>/docs`
+- **Frontend**: https://duolingo-six-zeta.vercel.app
+- **Backend API**: https://chamelo-api.onrender.com
+- **API Docs**: `https://chamelo-api.onrender.com/docs`
 
 ---
 
@@ -13,10 +13,10 @@ A production-quality language learning web application built as part of an SDE F
 
 | Layer | Technology |
 |-------|-----------|
-| Frontend | Next.js 14 (TypeScript), Tailwind CSS, Zustand, TanStack Query |
+| Frontend | Next.js 14 (TypeScript), Zustand, TanStack Query, Tailwind CSS |
 | Backend | Python 3.12, FastAPI, SQLAlchemy 2.0 |
 | Database | SQLite (SQLAlchemy ORM — portable to PostgreSQL) |
-| Deployment | Vercel (frontend), Railway (backend + SQLite) |
+| Deployment | Vercel (frontend), Render (backend + SQLite) |
 
 ---
 
@@ -180,6 +180,7 @@ App will be available at `http://localhost:3000`
 | 🌱 Basics | Greetings, Phrases, Animals | 4 |
 | ✈️ Travel | Numbers, Food, Colors | 4 |
 | 👨‍👩‍👧 Family | Family Members, Adjectives | 3 |
+| 🎸 Hobbies | Sports, Music, Art | 4 |
 
 **Default learner**: Skills 1 (Greetings) and 2 (Phrases) completed, Skill 3 (Animals) in progress.
 
