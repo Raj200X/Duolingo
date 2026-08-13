@@ -18,7 +18,7 @@ export function MultipleChoice({ exercise, onAnswer, disabled, correctAnswer, us
   function getOptionClass(opt: string) {
     if (!userAnswer) return "";
     if (opt === correctAnswer && userAnswer) return "correct";
-    if (opt === userAnswer && userAnswer !== correctAnswer) return "incorrect";
+    if (opt === userAnswer && correctAnswer !== undefined && userAnswer !== correctAnswer) return "incorrect";
     if (opt === userAnswer) return "selected";
     return "";
   }
