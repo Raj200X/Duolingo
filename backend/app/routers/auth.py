@@ -50,8 +50,8 @@ def login(
         key="session_id",
         value=session_id,
         httponly=True,
-        secure=not settings.DEBUG,
-        samesite="lax",
+        secure=True,
+        samesite="none",
         max_age=7 * 24 * 60 * 60,  # 7 days in seconds
     )
 
@@ -78,7 +78,7 @@ def logout(
     response.delete_cookie(
         key="session_id",
         httponly=True,
-        secure=not settings.DEBUG,
-        samesite="lax",
+        secure=True,
+        samesite="none",
     )
     return {"message": "Logged out"}
